@@ -418,7 +418,7 @@
 
           <div class="submit-row">
             <button type="submit" class="btn btn-primary">送出問卷</button>
-            <span class="form-note">送出後將開啟你的郵件軟體，確認後寄出即完成。</span>
+            <span class="form-note">送出後資料會直接送達，不需要另外寄信確認。</span>
           </div>
           <div id="formMsg"></div>
         </form>
@@ -465,16 +465,37 @@
 
 <script>
 (function(){
-  // TODO: 改成實際收件信箱（活動負責人 / 台灣窗口）
-  var SURVEY_RECEIVER_EMAIL = "apac.open.cycle@gmail.com";
+  // TODO: 部署 Google Apps Script 後，把網址貼在這裡（結尾是 /exec）
+  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw_Hzdjb9GxVdyFiiK6e796R5kpqgHRl6Dg2aD359KYxBd_vKwMz1Agyr-wagI7bKMz/exec";
+
+  // 備援：Apps Script 若還沒設定好，才會退回用 mailto 寄信
+  var FALLBACK_EMAIL = "apac.open.cycle@gmail.com";
 
   var form = document.getElementById('surveyForm');
   var msg = document.getElementById('formMsg');
+  var submitBtn = form.querySelector('button[type="submit"]');
 
   function getChecked(name){
     return Array.prototype.slice
       .call(document.querySelectorAll('input[name="'+name+'"]:checked'))
       .map(function(el){ return el.value; });
+  }
+
+  function sendViaMailto(payload){
+    var lines = [
+      'OPEN Cycle APAC 問卷回覆',
+      '------------------------------',
+      'Q1 最常用平台：' + payload.platform,
+      'Q2 有興趣的活動：' + (payload.activities || '（未填）'),
+      'Q3 想共騎的地區：' + (payload.regions || '（未填）'),
+      '暱稱：' + (payload.name || '（未填）'),
+      '聯絡方式：' + (payload.contact || '（未填）')
+    ];
+    var body = encodeURIComponent(lines.join('\n'));
+    var subject = encodeURIComponent('OPEN Cycle APAC 問卷回覆' + (payload.name ? '｜' + payload.name : ''));
+    window.location.href = 'mailto:' + FALLBACK_EMAIL + '?subject=' + subject + '&body=' + body;
+    msg.textContent = '已開啟郵件軟體，請確認內容後寄出即完成問卷。';
+    msg.className = 'show ok';
   }
 
   form.addEventListener('submit', function(e){
@@ -492,22 +513,39 @@
       return;
     }
 
-    var lines = [
-      'OPEN Cycle 台灣問卷回覆',
-      '------------------------------',
-      'Q1 最常用平台：' + platform.join(', '),
-      'Q2 有興趣的活動：' + (activities.length ? activities.join(', ') : '（未填）'),
-      'Q3 想共騎的地區：' + (regions.length ? regions.join(', ') : '（未填）'),
-      '暱稱：' + (name || '（未填）'),
-      '聯絡方式：' + (contact || '（未填）')
-    ];
-    var body = encodeURIComponent(lines.join('\n'));
-    var subject = encodeURIComponent('OPEN Cycle 台灣問卷回覆' + (name ? '｜' + name : ''));
+    var payload = {
+      platform: platform.join(', '),
+      activities: activities.join(', '),
+      regions: regions.join(', '),
+      name: name,
+      contact: contact
+    };
 
-    window.location.href = 'mailto:' + SURVEY_RECEIVER_EMAIL + '?subject=' + subject + '&body=' + body;
+    // 尚未設定 Apps Script 網址時，直接退回 mailto
+    if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('YOUR_DEPLOYMENT_ID') !== -1){
+      sendViaMailto(payload);
+      return;
+    }
 
-    msg.textContent = '已開啟郵件軟體，請確認內容後寄出即完成問卷。若沒有自動跳出，請確認裝置是否設定預設郵件 App。';
-    msg.className = 'show ok';
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送出中…';
+
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(payload)
+    }).then(function(){
+      msg.textContent = '已收到你的回覆，謝謝參加！';
+      msg.className = 'show ok';
+      form.reset();
+    }).catch(function(){
+      // 網路真的失敗時，退回 mailto 當備援
+      sendViaMailto(payload);
+    }).finally(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = '送出問卷';
+    });
   });
 })();
 </script>
