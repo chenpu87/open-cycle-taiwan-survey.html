@@ -140,6 +140,18 @@
     border:1px solid var(--line-strong);border-radius:999px;
     padding:7px 13px;background:var(--paper-raised);color:var(--ink-soft);
   }
+  .chip-link{
+    text-decoration:none;cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .chip-link:hover, .chip-link:focus-visible{
+    background:var(--ink);color:var(--paper-raised);border-color:var(--ink);
+  }
+  .link-plain{
+    color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);
+    text-underline-offset:2px;
+  }
+  .link-plain:hover{color:var(--rust);text-decoration-color:var(--rust);}
 
   /* Waypoint 02: product */
   .product-block{
@@ -330,9 +342,9 @@
           </blockquote>
           <p>國外媒體也完整報導了這次發表，包含車架掛點設計與裝載邏輯的深度解析，有興趣的朋友歡迎進一步閱讀：</p>
           <div class="press-row">
-            <span class="https://www.gravelcyclist.com/bicycle-tech/open-cycle-launches-the-open-w-i-d-e-2-0-66mm-of-clearance-plenty-more/#google_vignette">Gravel Cyclist</span>
-            <span class="https://www.cyclingweekly.com/products/new-open-wi-de-2-0-takes-gravel-clearances-to-a-whole-new-level-with-provision-for-gargantuan-66mm-tyres">Cycling Weekly</span>
-            <span class="http://opencycle.com/">opencycle.com</span>
+            <a class="chip chip-link" href="https://www.gravelcyclist.com/bicycle-tech/open-cycle-launches-the-open-w-i-d-e-2-0-66mm-of-clearance-plenty-more/#google_vignette" target="_blank" rel="noopener">Gravel Cyclist ↗</a>
+            <a class="chip chip-link" href="https://www.cyclingweekly.com/products/new-open-wi-de-2-0-takes-gravel-clearances-to-a-whole-new-level-with-provision-for-gargantuan-66mm-tyres" target="_blank" rel="noopener">Cycling Weekly ↗</a>
+            <a class="chip chip-link" href="https://opencycle.com/" target="_blank" rel="noopener">opencycle.com ↗</a>
           </div>
         </div>
       </div>
@@ -428,16 +440,16 @@
       <div class="contact-card">
         <div>
           <div class="label">台灣窗口</div>
-          <div class="value"><!-- TODO: 填入台灣專人聯絡窗口 --> apac.open.cycle@gmail.com</div>
+          <div class="value"><a class="link-plain" href="mailto:apac.open.cycle@gmail.com">apac.open.cycle@gmail.com</a></div>
         </div>
         <div>
           <div class="label">經銷 / 合作洽談</div>
-          <div class="value">台灣合作夥伴 CrossVelo </div> 
-          <span class="https://www.instagram.com/crossvelo_bike/">CrossVelo IG</span>
+          <div class="value">台灣合作夥伴 CrossVelo</div>
+          <a class="chip chip-link" href="https://www.instagram.com/crossvelo_bike/" target="_blank" rel="noopener">CrossVelo IG ↗</a>
         </div>
         <div>
           <div class="label">官方網站</div>
-          <div class="value">opencycle.com</div>
+          <div class="value"><a class="link-plain" href="https://opencycle.com/" target="_blank" rel="noopener">opencycle.com</a></div>
         </div>
       </div>
     </div>
